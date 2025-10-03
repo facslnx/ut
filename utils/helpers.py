@@ -94,11 +94,21 @@ def authenticate_user(email, senha):
     query = "SELECT id, nome, email, senha FROM usuarios WHERE email = %s"
     user = db.execute_query_one(query, (email,))
     
-    if user and verify_password(senha, user['senha']):
-        st.session_state['user_id'] = user['id']
-        st.session_state['username'] = user['nome']
-        st.session_state['email'] = user['email']
-        return True
+    if user:
+        # user é uma tupla: (id, nome, email, senha)
+        # Converter para dicionário para facilitar acesso
+        user_dict = {
+            'id': user[0],
+            'nome': user[1], 
+            'email': user[2],
+            'senha': user[3]
+        }
+        
+        if verify_password(senha, user_dict['senha']):
+            st.session_state['user_id'] = user_dict['id']
+            st.session_state['username'] = user_dict['nome']
+            st.session_state['email'] = user_dict['email']
+            return True
     return False
 
 def verify_password(password, hashed_password):
